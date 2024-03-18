@@ -1,0 +1,3 @@
+/home/sanchez/game_engines/Cengine/Cengine/build/CMakeFiles/Cengine.dir
+/home/sanchez/game_engines/Cengine/Cengine/build/CMakeFiles/edit_cache.dir
+/home/sanchez/game_engines/Cengine/Cengine/build/CMakeFiles/rebuild_cache.dir

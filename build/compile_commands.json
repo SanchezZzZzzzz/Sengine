@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/sanchez/game_engines/Cengine/Cengine/build",
+  "command": "/usr/bin/g++   -g -std=gnu++11 -o CMakeFiles/Cengine.dir/main.cpp.o -c /home/sanchez/game_engines/Cengine/Cengine/main.cpp",
+  "file": "/home/sanchez/game_engines/Cengine/Cengine/main.cpp"
+}
+]
