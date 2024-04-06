@@ -1,7 +1,10 @@
-#define PY_SSIZE_T_CLEAN
-#include <thread>
+#define SET_CURSOR_VISIBLE 1
+#define SET_CURSOR_HIDDEN 0
+#define SET_CURSOR_DISABLED 2
+//#include <signal.h>
+//#include <thread>
 #include <iostream>
-#include <string>
+//#include <string>
 #include <vector>
 #include <list>
 #include <fstream>
@@ -13,7 +16,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
-#include <Python.h>
+#include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtx/transform.hpp>
+#include "utility/error_callback.hpp"
 #include "input/input.hpp"
 #include "python/pythonscript.hpp"
 #include "graphics/shader.hpp"
@@ -24,12 +29,9 @@
 #include "graphics/window.hpp"
 #include "math/vector_maths.h"
 
-static wchar_t* program;
-static Window* current_window;
-int main(int argc, char*argv[]) {
-    program = Py_DecodeLocale(argv[0], NULL);
-    Window new_window(1024, 768, "Window", input);
-    current_window = &new_window;
+int main() {
+    glfwSetErrorCallback(&Error);
+    Window new_window(1920, 1080, "Window");
     new_window.render();
     return 0;
 }

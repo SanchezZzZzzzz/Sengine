@@ -1,9 +1,11 @@
-GLuint VAO;
+
+GLfloat PI = glm::pi<float>();
+GLfloat PI2 = PI*2;
 
 class Mesh{
 protected:
     GLuint VBO;
-    glm::mat4 mesh_transform = glm::mat4(1.0f);
+    glm::mat4 m_mesh_transform = glm::mat4(1.0f);
     std::vector<GLfloat>m_vertex_coordinates = {};
     GLfloat *vertices;
     GLuint array_size = 0;
@@ -79,6 +81,7 @@ void Mesh::setCubeShape(GLfloat x, GLfloat y, GLfloat z, GLfloat size){
     addVertex(x + size, y + size, z - size);
     addVertex(x + size, y - size, z - size);
     addVertex(x + size, y + size, z + size);
+    translateDataToBuffer(this->m_vertex_coordinates);
 }
 //legacy
 class Rectangle2D: public Mesh{
