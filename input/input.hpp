@@ -1,4 +1,5 @@
 static GLFWwindow* CURRENT_WINDOW;
+
 class Input{
 private:
     float m_x, m_y;

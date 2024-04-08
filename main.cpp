@@ -18,6 +18,7 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/transform.hpp>
+#include <memory>
 #include "utility/error_callback.hpp"
 #include "input/input.hpp"
 #include "python/pythonscript.hpp"
