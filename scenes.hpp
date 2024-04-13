@@ -13,21 +13,23 @@ namespace scn{
             nodes2D[i].mesh.draw();
         }
         cameraScript(*&test_camera);
+        //character.rotateY(glm::radians(1.f));
     }
     void sceneSetup(){
         Node2D testRectangle;
         character.addChild(*&test_camera);
         testRectangle.mesh.setCubeShape(0, 0, 0, 20);
         nodes2D.push_back(testRectangle);
-        character.translate({0, 0, 30});
+        character.translate({0, 20, 40});
         //test_camera.rotate(0, glm::radians(180.f), 0);
         test_camera->makeCurrent();
         input.setMouseMode(SET_CURSOR_DISABLED);
         glfwSetKeyCallback(CURRENT_WINDOW, getKeyInput);
     }
     void cameraScript(Node* camera){
-         camera->rotateX(glm::radians(input.mouse_y));
-         character.rotateY(glm::radians(input.mouse_x));
+         camera->rotateX(glm::radians(input.mouse_y) * 0.3);
+         //camera->rotateY(glm::radians(input.mouse_x));
+         character.rotateY(glm::radians(input.mouse_x) * -0.3);
     }
 };
 

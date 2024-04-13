@@ -14,17 +14,20 @@ public:
     void rotateX(GLfloat angle){  
         transform_matrix = glm::rotate(transform_matrix, angle, {1, 0, 0});
         this->matrix = transform_matrix * this->matrix;
-        transformChildren();
+        this->transform_matrix = glm::mat4(1.f);
+        //transformChildren();
     }
     void rotateY(GLfloat angle){
         transform_matrix = glm::rotate(transform_matrix, angle, {0, 1, 0});
         this->matrix = transform_matrix * this->matrix;
-        transformChildren();
+        this->transform_matrix = glm::mat4(1.f);
+        //transformChildren();
     }
     void translate(glm::vec3 new_position){
         this->transform_matrix = glm::translate(this->transform_matrix, new_position);
         this->matrix = this->matrix * this->transform_matrix;
-        transformChildren();
+        this->transform_matrix = glm::mat4(1.f);
+        //transformChildren();
     }
     void transformChildren(){
         for (Node* child: children){
@@ -35,7 +38,7 @@ public:
     }
     void makeCurrent();
     glm::mat4 getMatrix(){
-        return matrix;
+        return matrix * parent->matrix;
     }
 };
 void Node::attachScript(std::string scriptname){
@@ -61,4 +64,3 @@ Node* CURRENT_CAMERA = new Camera();
 void Node::makeCurrent(){
     CURRENT_CAMERA = this;
 }
-
