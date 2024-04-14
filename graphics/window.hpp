@@ -53,7 +53,7 @@ void Window::render(){
         do{
             input.getMousePosition();
             glClear( GL_COLOR_BUFFER_BIT );
-            setPerspective(45.f, input.getWindowSizeX(), input.getWindowSizeY(), 0.1, 100.0f, ProgramID);
+            setPerspective(45.f, input.getWindowSizeX(), input.getWindowSizeY(), 0.1, 10000.0f, ProgramID);
             glUseProgram(ProgramID);
             scn::scene();
             glfwSetCursorPos(CURRENT_WINDOW, 0, 0);     
