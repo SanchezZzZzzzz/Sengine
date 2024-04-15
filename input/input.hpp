@@ -1,10 +1,9 @@
 static GLFWwindow* CURRENT_WINDOW;
 
 class Input{
-private:
-    float m_x, m_y;
-public:
     double mouse_x = 0, mouse_y = 0;
+public:
+    
     void getMousePosition(){
         glfwGetCursorPos(CURRENT_WINDOW, &this->mouse_x, &this->mouse_y);
     }
@@ -28,15 +27,11 @@ public:
                 break;
         }
     }
-    double getWindowSizeX(){
-        return this->m_x;
+    float getMouseX(){
+        return mouse_x;
     }
-    float getWindowSizeY(){
-        return m_y;
-    }
-    void setWindowSize(float x, float y){
-        this->m_x = x;
-        this->m_y = y;
+    float getMouseY(){
+        return mouse_y;
     }
 };
 Input input;

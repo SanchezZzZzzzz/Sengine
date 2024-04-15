@@ -19,6 +19,7 @@ namespace scn{
             character.translate({0, SPEED, 0});
     }
     void scene(){
+        nodes2D[0].rotateX(glm::radians(10.f));
         for (GLuint i = 0; i < nodes2D.size(); i++){
             nodes2D[i].mesh.draw();
         }
@@ -36,8 +37,8 @@ namespace scn{
         glfwSetKeyCallback(CURRENT_WINDOW, getKeyInput);
     }
     void cameraScript(Node* camera){
-         camera->rotateX(glm::radians(input.mouse_y) * 0.3);
-         character.rotateY(glm::radians(input.mouse_x) * -0.3);
+         camera->rotateX(glm::radians(input.getMouseY()) * 0.3);
+         character.rotateY(glm::radians(input.getMouseX()) * -0.3);
     }
 };
 

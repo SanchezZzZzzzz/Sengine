@@ -24,7 +24,7 @@ public:
             glBindVertexArray(vertex_array_object);
         }
         CURRENT_WINDOW = this->m_window;
-        input.setWindowSize(x, y);
+        window_properties.setWindowSize(x, y);
     }
 
     void render();
@@ -52,8 +52,10 @@ void Window::render(){
         GLuint ProgramID = LoadShaders("/home/sanchez/game_engines/Cengine/Cengine/shaders/SimpleVertexShader.vertexshader", "/home/sanchez/game_engines/Cengine/Cengine/shaders/fragments.fragmentshader" );
         do{
             input.getMousePosition();
-            glClear( GL_COLOR_BUFFER_BIT );
-            setPerspective(45.f, input.getWindowSizeX(), input.getWindowSizeY(), 0.1, 10000.0f, ProgramID);
+            glEnable(GL_DEPTH_TEST);
+            glDepthFunc(GL_LESS);
+            glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            setPerspective(45.f, window_properties.getWindowX(), window_properties.getWindowY(), 0.1, 10000.0f, ProgramID);
             glUseProgram(ProgramID);
             scn::scene();
             glfwSetCursorPos(CURRENT_WINDOW, 0, 0);     

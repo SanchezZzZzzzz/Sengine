@@ -20,6 +20,7 @@
 #include <glm/gtx/transform.hpp>
 #include <memory>
 #include "utility/error_callback.hpp"
+#include "utility/properties.hpp"
 #include "input/input.hpp"
 #include "python/pythonscript.hpp"
 #include "graphics/shader.hpp"
