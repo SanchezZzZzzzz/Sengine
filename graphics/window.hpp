@@ -31,12 +31,6 @@ public:
     void close() {
         m_closed = 1;
     }
-    void setPerspective(GLfloat angle, GLfloat width, GLfloat height, GLfloat close, GLfloat far, GLuint &programID){
-        glm::mat4 projection = glm::perspective(glm::radians(angle), (float) width/height, close, far);
-        glm::mat4 mvp = projection * CURRENT_CAMERA->getMatrix() * glm::mat4(1.f);
-        GLuint MatrixID = glGetUniformLocation(programID, "MVP");
-        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
-    }
     void set_orthogonal(GLfloat x_start, GLfloat x_end, GLfloat y_start, GLfloat y_end, GLfloat z_near, GLfloat z_far, GLuint &programID){
         glm::mat4 projection = glm::ortho(x_start, x_end, y_start, y_end, z_near, z_far);
         glm::mat4 mvp = projection * CURRENT_CAMERA->getMatrix();
@@ -48,15 +42,12 @@ void Window::render(){
         glfwSetInputMode(m_window, GLFW_STICKY_KEYS, GL_TRUE);
         glClearColor(0.0, 0.0, 0.2, 0.0f);
         glfwSetCursorPos(CURRENT_WINDOW, 0, 0);
-        scn::sceneSetup();
-        GLuint ProgramID = LoadShaders("/home/sanchez/game_engines/Cengine/Cengine/shaders/SimpleVertexShader.vertexshader", "/home/sanchez/game_engines/Cengine/Cengine/shaders/fragments.fragmentshader" );
+        scn::sceneSetup();    
         do{
             input.getMousePosition();
             glEnable(GL_DEPTH_TEST);
             glDepthFunc(GL_LESS);
             glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            setPerspective(45.f, window_properties.getWindowX(), window_properties.getWindowY(), 0.1, 10000.0f, ProgramID);
-            glUseProgram(ProgramID);
             scn::scene();
             glfwSetCursorPos(CURRENT_WINDOW, 0, 0);     
             glFlush();

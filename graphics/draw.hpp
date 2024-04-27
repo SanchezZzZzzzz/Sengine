@@ -1,28 +1,6 @@
 GLfloat PI = glm::pi<float>();
 GLfloat PI2 = PI*2;
-std::vector<std::string> splitbystrings(std::string str, std::string splitter) {
-    std::vector<std::string> result = {};
-    while (str.find(splitter) != std::string::npos) {
-        result.push_back(str.substr(0, str.find(splitter)));
-        str.erase(0, str.find(splitter) + 1);
-    }
-    result.push_back(str);
-    return result;
-}
-std::vector<float> Get_float_vector(std::vector<std::string>& values, int begin) {
-    std::vector<float> result = {};
-    for (int i = begin; i < values.size(); i++)
-        result.push_back(std::stof(values[i]));
-    return result;
-}
-void addValsToArray(std::vector<float>& Property, std::string read_from) {
-    read_from.erase(0, read_from.find(" ") + 1);
-    Property.push_back(std::stof(read_from.substr(0, read_from.find(" "))));
-    read_from.erase(0, read_from.find(" ") + 1);
-    Property.push_back(std::stof(read_from.substr(0, read_from.find(" "))));
-    read_from.erase(0, read_from.find(" ") + 1);
-    Property.push_back(std::stof(read_from));
-}
+
 class Mesh{
 private:
     void Add_material();
@@ -32,6 +10,7 @@ protected:
     std::vector<glm::vec3>m_vertex_coordinates = {};
     std::vector<glm::vec3>m_normals = {};
     std::string m_mesh_type = "None";
+    GLuint programID, matrixID;
     void addVertex(GLfloat x, GLfloat y, GLfloat z){
         m_vertex_coordinates.push_back({x, y, z});
     }
@@ -46,19 +25,14 @@ protected:
 public:
     void setRectangleShape(GLfloat x_pos, GLfloat y_pos, GLfloat x_size, GLfloat y_size);
     void setCubeShape(GLfloat x, GLfloat y, GLfloat z, GLfloat size);
-    void draw(){
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-        glDrawArrays(GL_TRIANGLES, 0, m_vertex_coordinates.size());
-        glDisableVertexAttribArray(0);
-    }
+    void draw(glm::mat4 matrix);
     void loadFromFile(std::string file_name);
 };
 
 void Mesh::setRectangleShape(GLfloat x_pos, GLfloat y_pos, GLfloat x_size, GLfloat y_size){
     m_vertex_coordinates.clear();
     m_mesh_type = "Rectangle";
+    programID = LoadShaders("/home/sanchez/game_engines/Cengine/Cengine/shaders/SimpleVertexShader.vertexshader", "/home/sanchez/game_engines/Cengine/Cengine/shaders/fragments.fragmentshader" );
     addVertex(x_pos, y_pos, 0);
     addVertex(x_pos + x_size, y_pos, 0);
     addVertex(x_pos + x_size, y_pos + y_size, 0);
@@ -72,6 +46,7 @@ void Mesh::setCubeShape(GLfloat x, GLfloat y, GLfloat z, GLfloat size){
     m_vertex_coordinates.clear();
     m_normals.clear();
     m_mesh_type = "Cube";
+    programID = LoadShaders("/home/sanchez/game_engines/Cengine/Cengine/shaders/SimpleVertexShader.vertexshader", "/home/sanchez/game_engines/Cengine/Cengine/shaders/fragments.fragmentshader" );
     size /= 2;
     //rear triangle 1
     addVertex(x - size, y - size, z - size);

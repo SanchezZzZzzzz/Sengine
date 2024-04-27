@@ -3,6 +3,7 @@ private:
     float m_window_size_x;
     float m_window_size_y;
 public:
+    float fov = 60;
     float getWindowX(){
         return m_window_size_x;
     }

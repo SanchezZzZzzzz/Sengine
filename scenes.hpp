@@ -19,9 +19,9 @@ namespace scn{
             character.translate({0, SPEED, 0});
     }
     void scene(){
-        nodes2D[0].rotateX(glm::radians(10.f));
+        nodes2D[0].rotateY(glm::radians(1.f));
         for (GLuint i = 0; i < nodes2D.size(); i++){
-            nodes2D[i].mesh.draw();
+            nodes2D[i].draw();
         }
         cameraScript(*&test_camera);
     }

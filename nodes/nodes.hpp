@@ -5,6 +5,7 @@ protected:
     glm::vec3 rotation = {0.f, 0.f, 0.f};
     glm::vec3 position = {0.f, 0.f, 0.f};
 public:
+    Mesh mesh;
     Node* parent;
     std::list<Node*>children{};
     std::string script;
@@ -45,6 +46,9 @@ public:
     glm::mat4 getMatrix(){
         return matrix * parent->matrix;
     }
+    void draw(){
+        mesh.draw(matrix);
+    }
 };
 void Node::attachScript(std::string scriptname){
     const std::string scriptfile = scriptname;
@@ -53,7 +57,7 @@ void Node::attachScript(std::string scriptname){
 class Node2D: public Node{
 public:
     GLfloat x, y;
-    Mesh mesh;    
+        
 };
 class Camera: public Node{
 public:
@@ -68,4 +72,17 @@ public:
 Node* CURRENT_CAMERA = new Camera();
 void Node::makeCurrent(){
     CURRENT_CAMERA = this;
+}
+//========================================================================draw() is here due to CURRENT_CAMERA is here (this shit fucked me up)
+void Mesh::draw(glm::mat4 matrix){
+    glm::mat4 projection = glm::perspective(glm::radians(window_properties.fov), window_properties.getWindowX() / window_properties.getWindowY(), 0.1f, 1000.f);
+    glm::mat4 mvp = projection * CURRENT_CAMERA->getMatrix() * matrix;
+    matrixID = glGetUniformLocation(programID, "MVP");
+    glUniformMatrix4fv(matrixID, 1, GL_FALSE, &mvp[0][0]);
+    glUseProgram(programID);
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glDrawArrays(GL_TRIANGLES, 0, m_vertex_coordinates.size());
+    glDisableVertexAttribArray(0);
 }
