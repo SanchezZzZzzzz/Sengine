@@ -1,9 +1,8 @@
 #include "example_scripts/camera_control.hpp"
 namespace scn{
     void cameraScript(Node* camera);
-    std::vector<Node2D>nodes2D={};
-    std::vector<Node>nodes = {};
     Node character;
+    Node small_cube, cube, giant_cube;
     float SPEED = 1;
     Node* test_camera = new Camera();
     void getKeyInput(GLFWwindow* window, int key, int scancode, int action, int mods){
@@ -19,19 +18,26 @@ namespace scn{
             character.translate({0, SPEED, 0});
     }
     void scene(){
-        nodes2D[0].rotateY(glm::radians(1.f));
-        for (GLuint i = 0; i < nodes2D.size(); i++){
-            nodes2D[i].draw();
-        }
+        small_cube.rotateY(glm::radians(1.f));
+        giant_cube.draw();
+        cube.draw();
+        small_cube.draw();
         cameraScript(*&test_camera);
     }
     void sceneSetup(){
-        Node2D testRectangle;
+        setPerspectiveProjection();
+        small_cube.mesh.setShaders("/home/sanchez/game_engines/Cengine/Cengine/shaders/cube2.vertexshader", "/home/sanchez/game_engines/Cengine/Cengine/shaders/cube2.fragmentshader");
+        cube.mesh.setShaders("/home/sanchez/game_engines/Cengine/Cengine/shaders/cube1.vertexshader", "/home/sanchez/game_engines/Cengine/Cengine/shaders/cube1.fragmentshader");
+        giant_cube.mesh.setCubeShape(0, 0, 0, 20);
+        small_cube.mesh.setCubeShape(0, 0, 0, 3);
+        small_cube.translate({0, 20, 0});
+        cube.mesh.setCubeShape(0, 0, 0, 10);
+        cube.translate({0, -20, 0});
+        giant_cube.mesh.setShaders("/home/sanchez/game_engines/Cengine/Cengine/shaders/cube1.vertexshader", "/home/sanchez/game_engines/Cengine/Cengine/shaders/cube1.fragmentshader");
+        giant_cube.translate({100, 0, 0});
         character.addChild(*&test_camera);
-        testRectangle.mesh.setCubeShape(0, 0, 0, 20);
-        nodes2D.push_back(testRectangle);
-        character.translate({0, 0, 40});
-        test_camera->translate({0, 10, 0});
+        //character.rotateX(glm::radians(180.f));
+        character.translate({0, 0, -10});
         test_camera->makeCurrent();
         input.setMouseMode(SET_CURSOR_DISABLED);
         glfwSetKeyCallback(CURRENT_WINDOW, getKeyInput);

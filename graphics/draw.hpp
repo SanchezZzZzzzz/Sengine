@@ -1,16 +1,15 @@
 GLfloat PI = glm::pi<float>();
 GLfloat PI2 = PI*2;
-
+GLuint matrixID;
 class Mesh{
 private:
     void Add_material();
 protected:
     GLuint m_VBO;
-    glm::mat4 m_mesh_transform = glm::mat4(1.0f);
     std::vector<glm::vec3>m_vertex_coordinates = {};
     std::vector<glm::vec3>m_normals = {};
     std::string m_mesh_type = "None";
-    GLuint programID, matrixID;
+    GLuint programID = 0;
     void addVertex(GLfloat x, GLfloat y, GLfloat z){
         m_vertex_coordinates.push_back({x, y, z});
     }
@@ -23,6 +22,10 @@ protected:
         glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * this->m_vertex_coordinates.size(), &m_vertex_coordinates[0], GL_STATIC_DRAW);
     }
 public:
+    void setShaders(const char* vertex_shader, const char* fragments_shader){
+        programID = LoadShaders(vertex_shader, fragments_shader);
+        matrixID = glGetUniformLocation(this->programID, "MVP");
+    }
     void setRectangleShape(GLfloat x_pos, GLfloat y_pos, GLfloat x_size, GLfloat y_size);
     void setCubeShape(GLfloat x, GLfloat y, GLfloat z, GLfloat size);
     void draw(glm::mat4 matrix);
@@ -32,7 +35,6 @@ public:
 void Mesh::setRectangleShape(GLfloat x_pos, GLfloat y_pos, GLfloat x_size, GLfloat y_size){
     m_vertex_coordinates.clear();
     m_mesh_type = "Rectangle";
-    programID = LoadShaders("/home/sanchez/game_engines/Cengine/Cengine/shaders/SimpleVertexShader.vertexshader", "/home/sanchez/game_engines/Cengine/Cengine/shaders/fragments.fragmentshader" );
     addVertex(x_pos, y_pos, 0);
     addVertex(x_pos + x_size, y_pos, 0);
     addVertex(x_pos + x_size, y_pos + y_size, 0);
@@ -41,12 +43,10 @@ void Mesh::setRectangleShape(GLfloat x_pos, GLfloat y_pos, GLfloat x_size, GLflo
     addVertex(x_pos, y_pos, 0);
     translateDataToBuffer();
 }
-
 void Mesh::setCubeShape(GLfloat x, GLfloat y, GLfloat z, GLfloat size){
     m_vertex_coordinates.clear();
     m_normals.clear();
     m_mesh_type = "Cube";
-    programID = LoadShaders("/home/sanchez/game_engines/Cengine/Cengine/shaders/SimpleVertexShader.vertexshader", "/home/sanchez/game_engines/Cengine/Cengine/shaders/fragments.fragmentshader" );
     size /= 2;
     //rear triangle 1
     addVertex(x - size, y - size, z - size);
@@ -89,9 +89,13 @@ void Mesh::setCubeShape(GLfloat x, GLfloat y, GLfloat z, GLfloat size){
     addVertex(x + size, y + size, z + size);
     addNormalVector(1, 0, 0);
     //top tirangle 1
-    addVertex(x - size, y - size, z + size);
-    addVertex(x + size, y - size, z + size);
-    addVertex(x + size, y - size, z - size);
+    addVertex(x - size, y + size, z + size);
+    addVertex(x + size, y + size, z + size);
+    addVertex(x + size, y + size, z - size);
+    //top tirangle 2
+    addVertex(x - size, y + size, z + size);
+    addVertex(x + size, y + size, z - size);
+    addVertex(x - size, y + size, z - size);
     translateDataToBuffer();
 }
 // void Mesh::loadFromFile(std::string file_name){
