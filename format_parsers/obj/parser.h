@@ -190,13 +190,13 @@ vector<float> Get_float_vector(vector<string>& values, int begin) {
             read_from.erase(0, read_from.find(" ") + 1);
             Property.push_back(stof(read_from));
         }
-        Material* FindMaterialByName(vector<Material>& Matlist, string Matname) {
-            for (int i = 0; i < Matlist.size(); i++) {
-                if (Matname == Matlist[i].name)
-                    return &Matlist[i];
-            }
-            return &*new Material;
+    Material* FindMaterialByName(vector<Material>& Matlist, string Matname) {
+        for (int i = 0; i < Matlist.size(); i++) {
+            if (Matname == Matlist[i].name)
+                return &Matlist[i];
         }
+        return &*new Material;
+    }
         void GetNormalVector(GLfloat (&NormalVec)[3],vector<vector<GLfloat>>& Normals) {
             for (int i = 0; i < Normals.size(); i++) {
                 NormalVec[0] += Normals[i][0];

@@ -71,10 +71,15 @@ void Node::makeCurrent(){
 void Mesh::draw(glm::mat4 matrix){
     glUseProgram(programID);
     glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glBindBuffer(GL_ARRAY_BUFFER, m_NBO);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glDrawArrays(GL_TRIANGLES, 0, m_vertex_coordinates.size());
     glDisableVertexAttribArray(0);
     mvp = projection * CURRENT_CAMERA->getMatrix() * glm::inverse(matrix);
-    glUniformMatrix4fv(matrixID, 1, GL_FALSE, &mvp[0][0]);
+    glUniformMatrix4fv(mvpid, 1, GL_FALSE, &mvp[0][0]);
+    glUniformMatrix4fv(vid, 1, GL_FALSE, &CURRENT_CAMERA->getMatrix()[0][0]);
+    glUniformMatrix4fv(mid, 1, GL_FALSE, &glm::inverse(matrix)[0][0]);
 }

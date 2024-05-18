@@ -40,7 +40,7 @@ public:
 };
 void Window::render(){
         glfwSetInputMode(m_window, GLFW_STICKY_KEYS, GL_TRUE);
-        glClearColor(0.0, 0.0, 0.2, 0.0f);
+        glClearColor(0.0f, 0.05, 0.1f, 0.0f);
         glfwSetCursorPos(CURRENT_WINDOW, 0, 0);
         scn::sceneSetup();    
         do{
