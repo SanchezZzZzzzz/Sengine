@@ -12,7 +12,7 @@ protected:
     glm::vec3 position = {0.f, 0.f, 0.f};
 public:
     Mesh mesh;
-    Node* parent;
+    Node* parent = nullptr;
     std::list<Node*>children{};
     std::string script;
     void attachScript(std::string scriptname);
@@ -40,7 +40,7 @@ public:
     }
     void makeCurrent();
     glm::mat4 getMatrix(){
-        if (this->parent != nullptr){
+        if (parent != nullptr){
             return matrix * parent->getMatrix();
         }
         return matrix;
@@ -75,11 +75,73 @@ void Mesh::draw(glm::mat4 matrix){
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glBindBuffer(GL_ARRAY_BUFFER, m_NBO);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glDrawArrays(GL_TRIANGLES, 0, m_vertex_coordinates.size());
     glDisableVertexAttribArray(0);
     mvp = projection * CURRENT_CAMERA->getMatrix() * glm::inverse(matrix);
     glUniformMatrix4fv(mvpid, 1, GL_FALSE, &mvp[0][0]);
     glUniformMatrix4fv(vid, 1, GL_FALSE, &CURRENT_CAMERA->getMatrix()[0][0]);
     glUniformMatrix4fv(mid, 1, GL_FALSE, &glm::inverse(matrix)[0][0]);
+}
+
+std::vector<Node> loadMeshFromFile(std::string file_name){
+    const std::string tempFname = file_name; //Имя файла в const строке
+    std::vector<Node> node_set = {};
+    std::string material;
+    std::ifstream obj(tempFname); //Файл объектов в obj
+    Node temp;
+    if (obj.is_open()) { //Если открыт
+        std::vector<glm::vec3>vertices = {};
+        std::vector<glm::vec2>texture_coordinates = {};
+        std::vector<glm::vec3>normals = {};
+        std::string parsed;
+        Material last_material;
+        bool new_mesh = 0;
+        while (getline(obj, parsed)) {
+            std::vector<std::string> tempstr = splitByStrings(parsed, " ");
+            if (tempstr[0] == "o") {
+                if (new_mesh)
+                    node_set.push_back(temp);
+                else
+                    new_mesh = 1;
+                temp = *new Node;
+                temp.mesh.m_mesh_name = tempstr[1];
+            }
+            else if (tempstr[0] == "mtllib") {
+                addMaterial(tempstr[1]);
+            }
+            else if (parsed[0] != '#' && parsed[0] != 'm') {
+                if (tempstr[0] == "f") {
+                    for (int i = 1; i < tempstr.size(); i++) {
+                        std::vector<std::string>vertex = splitByStrings(tempstr[i], "/");
+                        if (vertex[0] != ""){
+                            temp.mesh.addVertex(vertices[stoi(vertex[0]) - 1]);
+                            temp.mesh.addDiffuseColor(last_material.diffuse_color);
+                        }             
+                        if (vertex[1] != "")
+                            temp.mesh.addTexureCoordinate(texture_coordinates[stoi(vertex[1]) - 1]);
+                        if (vertex[2] != "")
+                            temp.mesh.addNormalVector(normals[stoi(vertex[2]) - 1]);
+                    }
+                }
+                else if (tempstr[0] == "usemtl") {
+                    last_material = findMaterialByName(tempstr[1]);
+                }
+                else if (tempstr[0] != "s") {
+                    glm::vec3 coords = getFloatVector(tempstr, 1);
+                    if (tempstr[0] == "v") //Если строка это вершины
+                        vertices.push_back(coords);
+                    else if (tempstr[0] == "vt") //Тот же алгоритм с текстурными координатами
+                        texture_coordinates.push_back(glm::vec2(coords));
+                    else if (tempstr[0] == "vn") //И нормальными
+                        normals.push_back(coords);
+                }
+            }
+        }
+        node_set.push_back(temp);
+        for (unsigned int i = 0; i < node_set.size(); i++){
+            node_set[i].mesh.translateDataToBuffer();
+        }        
+    }
+    return node_set;
 }

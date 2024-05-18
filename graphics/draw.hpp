@@ -6,7 +6,7 @@ struct Material{
     glm::vec3 diffuse_color;
     glm::vec3 ambient_light_color;
     glm::vec3 reflection_color;
-    glm::vec3 transparency;
+    GLfloat transparency;
 };
 std::vector<Material>materials_list = {};
 std::vector<std::string> splitByStrings(std::string string, std::string splitter) {
@@ -19,9 +19,7 @@ std::vector<std::string> splitByStrings(std::string string, std::string splitter
     return result;
 }
 glm::vec3 getFloatVector(std::vector<std::string>& values, unsigned short begin) {
-    glm::vec3 result = {};
-    for (unsigned short i = begin; i < values.size(); i++)
-        result[i] = stof(values[i]);
+    glm::vec3 result = glm::vec3(stof(values[begin]), stof(values[begin + 1]), stof(values[begin + 2]));
     return result;
 }
 void addMaterial(std::string materials) {
@@ -51,7 +49,7 @@ void addMaterial(std::string materials) {
                 else if (current_string[0] == "Ks")
                     temp_material.reflection_color = getFloatVector(current_string, 1);
                 else if (current_string[0] == "d")
-                    temp_material.transparency = getFloatVector(current_string, 1);
+                    temp_material.transparency = stof(current_string[1]);
             }
             catch (...) {
                 std::cout << "Error occured while reading: " << parsed << "\n";
@@ -80,6 +78,8 @@ protected:
     std::vector<Material>materials_set = {};
     GLuint programID = 0;
     GLuint mvpid, mid, vid;
+public:
+    std::string m_mesh_name = "None";
 
     void translateDataToBuffer(){
         glGenBuffers(1, &m_VBO);
@@ -89,9 +89,6 @@ protected:
         glBindBuffer(GL_ARRAY_BUFFER, m_NBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * this->m_normals.size(), &m_normals[0], GL_STATIC_DRAW);
     }
-public:
-    std::string m_mesh_name = "None";
-
     void addVertex(GLfloat x, GLfloat y, GLfloat z){
         m_vertex_coordinates.push_back({x, y, z});
     }
@@ -228,56 +225,4 @@ void Mesh::setCubeShape(GLfloat x, GLfloat y, GLfloat z, GLfloat size){
     addNormalVector(0, 1, 0);
     translateDataToBuffer();
 }
-std::vector<Mesh> loadMeshFromFile(std::string file_name){
-    const std::string tempFname = file_name; //Имя файла в const строке
-    std::vector<Mesh> mesh_set = {};
-    std::string material;
-    std::ifstream obj(tempFname); //Файл объектов в obj
-    Mesh temp;
-    if (obj.is_open()) { //Если открыт
-        std::vector<glm::vec3>vertices = {};
-        std::vector<glm::vec2>texture_coordinates = {};
-        std::vector<glm::vec3>normals = {};
-        std::string parsed;
-        Material last_material;
-        while (getline(obj, parsed)) {
-            std::vector<std::string> tempstr = splitByStrings(parsed, " ");
-            if (tempstr[0] == "o") {
-                temp = *new Mesh;
-                temp.m_mesh_name = tempstr[1];
-            }
-            else if (tempstr[0] == "mtllib") {
-                addMaterial(tempstr[1]);
-            }
-            else if (parsed[0] != '#' && parsed[0] != 'm') {
-                if (tempstr[0] == "f") {
-                    for (int i = 1; i < tempstr.size(); i++) {
-                        std::vector<std::string>vertex = splitByStrings(tempstr[i], "/");
-                        if (vertex[0] != ""){
-                            temp.addVertex(vertices[stoi(vertex[0]) - 1]);
-                            temp.addDiffuseColor(last_material.diffuse_color);
-                        }             
-                        if (vertex[1] != "")
-                            temp.addTexureCoordinate(texture_coordinates[stoi(vertex[1]) - 1]);
-                        if (vertex[2] != "")
-                            temp.addNormalVector(normals[stoi(vertex[2]) - 1]);
-                    }
-                }
-                else if (tempstr[0] == "usemtl") {
-                    last_material = findMaterialByName(tempstr[1]);
-                }
-                else if (tempstr[0] != "s") {
-                    glm::vec3 coords = getFloatVector(tempstr, 1);
-                    if (tempstr[0] == "v") //Если строка это вершины
-                        vertices.push_back(coords);
-                    else if (tempstr[0] == "vt") //Тот же алгоритм с текстурными координатами
-                        texture_coordinates.push_back(coords);
-                    else if (tempstr[0] == "vn") //И нормальными
-                        normals.push_back(coords);
-                }
-            }
-        }
-        mesh_set.push_back(temp);
-    }
-    return mesh_set;
-}
+

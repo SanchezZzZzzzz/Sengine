@@ -3,6 +3,7 @@ namespace scn{
     void cameraScript(Node* camera);
     Node character;
     Node small_cube, cube;
+    std::vector<Node>ak = {};
     float SPEED = 1;
     Node* test_camera = new Camera();
     void getKeyInput(GLFWwindow* window, int key, int scancode, int action, int mods){
@@ -22,13 +23,20 @@ namespace scn{
     void scene(){
         small_cube.rotateY(glm::radians(1.f));
         cube.draw();
+        for (int i = 0; i < ak.size(); i++){
+            ak[i].draw();
+        }
         small_cube.draw();
         cameraScript(*&test_camera);
     }
     void sceneSetup(){
         setPerspectiveProjection();
+        ak = loadMeshFromFile("AK.obj");
+        for (int i = 0; i < ak.size(); i++){
+            ak[i].mesh.setShaders("/home/sanchez/game_engines/Cengine/Cengine/shaders/cube1.vertexshader", "/home/sanchez/game_engines/Cengine/Cengine/shaders/cube1.fragmentshader");
+        }
         small_cube.mesh.setShaders("/home/sanchez/game_engines/Cengine/Cengine/shaders/cube2.vertexshader", "/home/sanchez/game_engines/Cengine/Cengine/shaders/cube2.fragmentshader");
-        cube.mesh.setShaders("/home/sanchez/game_engines/Cengine/Cengine/shaders/cube1.vertexshader", "/home/sanchez/game_engines/Cengine/Cengine/shaders/cube1.fragmentshader");
+        //cube.mesh.setShaders("/home/sanchez/game_engines/Cengine/Cengine/shaders/cube1.vertexshader", "/home/sanchez/game_engines/Cengine/Cengine/shaders/cube1.fragmentshader");
         small_cube.mesh.setCubeShape(0, 0, 0, 3);
         small_cube.rotateX(glm::radians(180.f));
         small_cube.translate({0, -20, 0});
