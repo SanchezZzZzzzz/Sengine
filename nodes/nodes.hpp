@@ -72,10 +72,16 @@ void Mesh::draw(glm::mat4 matrix){
     glUseProgram(programID);
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
+    glEnableVertexAttribArray(3);
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glBindBuffer(GL_ARRAY_BUFFER, m_NBO);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glBindBuffer(GL_ARRAY_BUFFER, m_DifBO);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glBindBuffer(GL_ARRAY_BUFFER, m_RefBO);
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glDrawArrays(GL_TRIANGLES, 0, m_vertex_coordinates.size());
     glDisableVertexAttribArray(0);
     mvp = projection * CURRENT_CAMERA->getMatrix() * glm::inverse(matrix);
@@ -98,44 +104,50 @@ std::vector<Node> loadMeshFromFile(std::string file_name){
         Material last_material;
         bool new_mesh = 0;
         while (getline(obj, parsed)) {
-            std::vector<std::string> tempstr = splitByStrings(parsed, " ");
-            if (tempstr[0] == "o") {
-                if (new_mesh)
-                    node_set.push_back(temp);
-                else
-                    new_mesh = 1;
-                temp = *new Node;
-                temp.mesh.m_mesh_name = tempstr[1];
-            }
-            else if (tempstr[0] == "mtllib") {
-                addMaterial(tempstr[1]);
-            }
-            else if (parsed[0] != '#' && parsed[0] != 'm') {
-                if (tempstr[0] == "f") {
-                    for (int i = 1; i < tempstr.size(); i++) {
-                        std::vector<std::string>vertex = splitByStrings(tempstr[i], "/");
-                        if (vertex[0] != ""){
-                            temp.mesh.addVertex(vertices[stoi(vertex[0]) - 1]);
-                            temp.mesh.addDiffuseColor(last_material.diffuse_color);
-                        }             
-                        if (vertex[1] != "")
-                            temp.mesh.addTexureCoordinate(texture_coordinates[stoi(vertex[1]) - 1]);
-                        if (vertex[2] != "")
-                            temp.mesh.addNormalVector(normals[stoi(vertex[2]) - 1]);
+            try{
+                std::vector<std::string> tempstr = splitByStrings(parsed, " ");
+                if (tempstr[0] == "o") {
+                    if (new_mesh)
+                        node_set.push_back(temp);
+                    else
+                        new_mesh = 1;
+                    temp = *new Node;
+                    temp.mesh.m_mesh_name = tempstr[1];
+                }
+                else if (tempstr[0] == "mtllib") {
+                    addMaterial(tempstr[1]);
+                }
+                else if (parsed[0] != '#' && parsed[0] != 'm') {
+                    if (tempstr[0] == "f") {
+                            for (int i = 1; i < tempstr.size(); i++) {
+                                std::vector<std::string>vertex = splitByStrings(tempstr[i], "/");
+                                if (vertex[0] != ""){
+                                    temp.mesh.addVertex(vertices[stoi(vertex[0]) - 1]);
+                                    temp.mesh.addDiffuseColor(last_material.diffuse_color);
+                                    temp.mesh.addReflectionCoefficient(last_material.reflection_coefficient);
+                                }             
+                                if (vertex[1] != "")
+                                    temp.mesh.addTexureCoordinate(texture_coordinates[stoi(vertex[1]) - 1]);
+                                if (vertex[2] != "")
+                                    temp.mesh.addNormalVector(normals[stoi(vertex[2]) - 1]);
+                            }  
+                    }
+                    else if (tempstr[0] == "usemtl") {
+                        last_material = findMaterialByName(tempstr[1]);
+                    }
+                    else if (tempstr[0] != "s") {
+                        glm::vec3 coords = getFloatVector(tempstr, 1);
+                        if (tempstr[0] == "v") //Если строка это вершины
+                            vertices.push_back(coords);
+                        else if (tempstr[0] == "vt") //Тот же алгоритм с текстурными координатами
+                            texture_coordinates.push_back(glm::vec2(coords));
+                        else if (tempstr[0] == "vn") //И нормальными
+                            normals.push_back(coords);
                     }
                 }
-                else if (tempstr[0] == "usemtl") {
-                    last_material = findMaterialByName(tempstr[1]);
-                }
-                else if (tempstr[0] != "s") {
-                    glm::vec3 coords = getFloatVector(tempstr, 1);
-                    if (tempstr[0] == "v") //Если строка это вершины
-                        vertices.push_back(coords);
-                    else if (tempstr[0] == "vt") //Тот же алгоритм с текстурными координатами
-                        texture_coordinates.push_back(glm::vec2(coords));
-                    else if (tempstr[0] == "vn") //И нормальными
-                        normals.push_back(coords);
-                }
+            }
+            catch(...){
+                printf("Got an error in string '%s'", parsed);
             }
         }
         node_set.push_back(temp);

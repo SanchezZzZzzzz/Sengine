@@ -1,15 +1,25 @@
- #version 330 core
-out vec3 color;
-vec3 light_color = vec3(1.0, 1.0, 1.0);
+#version 330 core
+vec3 light_color1 = vec3(0.8, 0.5, 0.3);
+vec3 light_color2 = vec3(0.1, 0.1, 0.5);
 float LightPower;
-vec3 material_diffuse_color = vec3(0.5, 0.5, 0.5);
+in vec3 material_diffuse_color;
 in vec3 Normal_cameraspace;
-in vec3 LightDirection_cameraspace;
+in vec3 light_direction_1;
+in vec3 light_direction_2;
+in vec3 EyeDirection_cameraspace;
+in vec3 reflection_coefficient;
 vec3 n;
-vec3 l;
+vec3 l1;
+vec3 l2;
+out vec3 color;
 void main(){
   n = normalize(Normal_cameraspace);
-  l = normalize(LightDirection_cameraspace);
-  float cos_theta = clamp(dot(n, l), 0, 1);
-  color = light_color * cos_theta * material_diffuse_color;
+  l1 = normalize(light_direction_1);
+  l2 = normalize(light_direction_2);
+  vec3 e = normalize(EyeDirection_cameraspace);
+  vec3 r = reflect(-l1, n);
+  float cos_alpha = clamp(dot(e, r), 0, 1);
+  float cos_theta1 = clamp(dot(n, l1), 0.1, 1);
+  float cos_theta2 = clamp(dot(n, l2), 0.1, 1);
+  color = (material_diffuse_color * light_color1 * cos_theta1 * 1.75) + (material_diffuse_color * cos_theta2 * light_color2); 
 }

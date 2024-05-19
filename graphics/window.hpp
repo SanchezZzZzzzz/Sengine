@@ -42,11 +42,17 @@ void Window::render(){
         glfwSetInputMode(m_window, GLFW_STICKY_KEYS, GL_TRUE);
         glClearColor(0.0f, 0.05, 0.1f, 0.0f);
         glfwSetCursorPos(CURRENT_WINDOW, 0, 0);
+        glfwWindowHint(GLFW_SAMPLES, 8);
+        glEnable(GL_MULTISAMPLE);
+        glEnable(GL_CULL_FACE);
+        glFrontFace(GL_CW);
+        glCullFace(GL_FRONT);
         scn::sceneSetup();    
         do{
             input.getMousePosition();
             glEnable(GL_DEPTH_TEST);
             glDepthFunc(GL_LESS);
+            glfwSetInputMode(CURRENT_WINDOW, GLFW_STICKY_KEYS, GLFW_TRUE);
             glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             scn::scene();
             glfwSetCursorPos(CURRENT_WINDOW, 0, 0);     

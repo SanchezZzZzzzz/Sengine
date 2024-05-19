@@ -22,6 +22,20 @@ glm::vec3 getFloatVector(std::vector<std::string>& values, unsigned short begin)
     glm::vec3 result = glm::vec3(stof(values[begin]), stof(values[begin + 1]), stof(values[begin + 2]));
     return result;
 }
+Material findMaterialByName( std::string Matname) {
+    for (int i = 0; i < materials_list.size(); i++) {
+        if (Matname == materials_list[i].name)
+            return materials_list[i];
+    }
+    return materials_list[0];
+}
+bool materialLoaded(std::string material_name){
+    for (int i = 0; i < materials_list.size(); i++) {
+        if (material_name == materials_list[i].name)
+            return true;
+    }
+    return false;
+}
 void addMaterial(std::string materials) {
     const std::string material_file = materials;
     std::ifstream material_file_stream(material_file);
@@ -61,21 +75,15 @@ void addMaterial(std::string materials) {
         std::cout << "Couldn't find Material file :(\n";
     }
 }
-Material findMaterialByName( std::string Matname) {
-    for (int i = 0; i < materials_list.size(); i++) {
-        if (Matname == materials_list[i].name)
-            return materials_list[i];
-    }
-    return materials_list[0];
-}
+
 class Mesh{
 protected:
-    GLuint m_VBO, m_NBO;
+    GLuint m_VBO, m_NBO, m_DifBO, m_RefBO;
     std::vector<glm::vec3>m_vertex_coordinates = {};
     std::vector<glm::vec3>m_normals = {};
     std::vector<glm::vec2>m_texture_coordinates = {};
     std::vector<glm::vec3>m_diffuse_color = {};
-    std::vector<Material>materials_set = {};
+    std::vector<GLfloat>m_reflection_coefficient = {};
     GLuint programID = 0;
     GLuint mvpid, mid, vid;
 public:
@@ -88,6 +96,12 @@ public:
         glGenBuffers(1, &m_NBO);
         glBindBuffer(GL_ARRAY_BUFFER, m_NBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * this->m_normals.size(), &m_normals[0], GL_STATIC_DRAW);
+        glGenBuffers(1, &m_DifBO);
+        glBindBuffer(GL_ARRAY_BUFFER, m_DifBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * this->m_diffuse_color.size(), &m_diffuse_color[0], GL_STATIC_DRAW);
+        glGenBuffers(1, &m_RefBO);
+        glBindBuffer(GL_ARRAY_BUFFER, m_RefBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * this->m_reflection_coefficient.size(), &m_reflection_coefficient, GL_STATIC_DRAW);
     }
     void addVertex(GLfloat x, GLfloat y, GLfloat z){
         m_vertex_coordinates.push_back({x, y, z});
@@ -110,8 +124,10 @@ public:
     void addDiffuseColor(glm::vec3 diffuse_color){
         m_diffuse_color.push_back(diffuse_color);
     }
-
-
+    void addReflectionCoefficient(GLfloat value){
+        m_reflection_coefficient.push_back(value);
+    }
+        
     void setShaders(const char* vertex_shader, const char* fragments_shader){
         programID = LoadShaders(vertex_shader, fragments_shader);
         mvpid = glGetUniformLocation(this->programID, "MVP");
@@ -146,6 +162,10 @@ void Mesh::setCubeShape(GLfloat x, GLfloat y, GLfloat z, GLfloat size){
     addNormalVector(0, 0, -1);
     addNormalVector(0, 0, -1);
     addNormalVector(0, 0, -1);
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addReflectionCoefficient(1.f);
     //rear triangle 2
     addVertex(x + size, y + size, z - size);
     addVertex(x - size, y + size, z - size);
@@ -153,6 +173,10 @@ void Mesh::setCubeShape(GLfloat x, GLfloat y, GLfloat z, GLfloat size){
     addNormalVector(0, 0, -1);
     addNormalVector(0, 0, -1);
     addNormalVector(0, 0, -1);
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addReflectionCoefficient(1.f);
     //left triangle 1
     addVertex(x - size, y - size, z - size);
     addVertex(x - size, y - size, z + size);
@@ -160,6 +184,10 @@ void Mesh::setCubeShape(GLfloat x, GLfloat y, GLfloat z, GLfloat size){
     addNormalVector(-1, 0, 0);
     addNormalVector(-1, 0, 0);
     addNormalVector(-1, 0, 0);
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addReflectionCoefficient(1.f);
     //left triangle 2
     addVertex(x - size, y - size, z - size);
     addVertex(x - size, y + size, z + size);
@@ -167,6 +195,10 @@ void Mesh::setCubeShape(GLfloat x, GLfloat y, GLfloat z, GLfloat size){
     addNormalVector(-1, 0, 0);
     addNormalVector(-1, 0, 0);
     addNormalVector(-1, 0, 0);
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addReflectionCoefficient(1.f);
     //front triangle 1
     addVertex(x + size, y + size, z + size);
     addVertex(x - size, y - size, z + size);
@@ -174,6 +206,10 @@ void Mesh::setCubeShape(GLfloat x, GLfloat y, GLfloat z, GLfloat size){
     addNormalVector(0, 0, 1);
     addNormalVector(0, 0, 1);
     addNormalVector(0, 0, 1);
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addReflectionCoefficient(1.f);
     //front triangle 2
     addVertex(x - size, y - size, z + size);
     addVertex(x + size, y + size, z + size);
@@ -181,6 +217,10 @@ void Mesh::setCubeShape(GLfloat x, GLfloat y, GLfloat z, GLfloat size){
     addNormalVector(0, 0, 1);
     addNormalVector(0, 0, 1);
     addNormalVector(0, 0, 1);
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addReflectionCoefficient(1.f);
     //right triangle 1
     addVertex(x + size, y + size, z + size);
     addVertex(x + size, y - size, z - size);
@@ -188,6 +228,10 @@ void Mesh::setCubeShape(GLfloat x, GLfloat y, GLfloat z, GLfloat size){
     addNormalVector(1, 0, 0);
     addNormalVector(1, 0, 0);
     addNormalVector(1, 0, 0);
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addReflectionCoefficient(1.f);
     //right triangle 2
     addVertex(x + size, y + size, z - size);
     addVertex(x + size, y - size, z - size);
@@ -195,6 +239,10 @@ void Mesh::setCubeShape(GLfloat x, GLfloat y, GLfloat z, GLfloat size){
     addNormalVector(1, 0, 0);
     addNormalVector(1, 0, 0);
     addNormalVector(1, 0, 0);
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addReflectionCoefficient(1.f);
     //bottom tirangle 1
     addVertex(x - size, y - size, z + size);
     addVertex(x + size, y - size, z + size);
@@ -202,6 +250,10 @@ void Mesh::setCubeShape(GLfloat x, GLfloat y, GLfloat z, GLfloat size){
     addNormalVector(0, -1, 0);
     addNormalVector(0, -1, 0);
     addNormalVector(0, -1, 0);
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addReflectionCoefficient(1.f);
     //bottom tirangle 2
     addVertex(x - size, y - size, z + size);
     addVertex(x + size, y - size, z - size);
@@ -209,6 +261,10 @@ void Mesh::setCubeShape(GLfloat x, GLfloat y, GLfloat z, GLfloat size){
     addNormalVector(0, -1, 0);
     addNormalVector(0, -1, 0);
     addNormalVector(0, -1, 0);
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addReflectionCoefficient(1.f);
     //top tirangle 1
     addVertex(x - size, y + size, z + size);
     addVertex(x + size, y + size, z + size);
@@ -216,6 +272,10 @@ void Mesh::setCubeShape(GLfloat x, GLfloat y, GLfloat z, GLfloat size){
     addNormalVector(0, 1, 0);
     addNormalVector(0, 1, 0);
     addNormalVector(0, 1, 0);
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addReflectionCoefficient(1.f);
     //top tirangle 2
     addVertex(x - size, y + size, z + size);
     addVertex(x + size, y + size, z - size);
@@ -223,6 +283,10 @@ void Mesh::setCubeShape(GLfloat x, GLfloat y, GLfloat z, GLfloat size){
     addNormalVector(0, 1, 0);
     addNormalVector(0, 1, 0);
     addNormalVector(0, 1, 0);
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addDiffuseColor(glm::vec3(1.f, 1.f, 1.f));
+    addReflectionCoefficient(1.f);
     translateDataToBuffer();
 }
 
