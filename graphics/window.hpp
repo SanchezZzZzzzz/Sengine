@@ -10,6 +10,11 @@ public:
         glewExperimental = GL_TRUE;
         if (GL_TRUE != glfwInit())
             fprintf(stderr, "Error!");
+        glfwWindowHint(GLFW_SAMPLES, 16);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         this->m_window = glfwCreateWindow(x, y, window_name, NULL, NULL);
         if (this->m_window == NULL){
             fprintf(stderr, "Failed to open GLFW window\n");
@@ -42,8 +47,8 @@ void Window::render(){
         glfwSetInputMode(m_window, GLFW_STICKY_KEYS, GL_TRUE);
         glClearColor(0.0f, 0.05, 0.1f, 0.0f);
         glfwSetCursorPos(CURRENT_WINDOW, 0, 0);
-        glfwWindowHint(GLFW_SAMPLES, 8);
         glEnable(GL_MULTISAMPLE);
+        glEnable(GL_LINE_SMOOTH);
         glEnable(GL_CULL_FACE);
         glFrontFace(GL_CW);
         glCullFace(GL_FRONT);
