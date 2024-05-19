@@ -80,10 +80,9 @@ namespace scn{
         setPerspectiveProjection();
         ak = loadMeshFromFile("AGAT.obj");
         for (int i = 0; i < ak.size(); i++){
-            ak[i].mesh.setShaders("/home/sanchez/game_engines/Cengine/Cengine/shaders/cube1.vertexshader", "/home/sanchez/game_engines/Cengine/Cengine/shaders/cube1.fragmentshader");
+            ak[i].mesh.setShaders("shaders/cube1.vertexshader", "shaders/cube1.fragmentshader");
         }
-        small_cube.mesh.setShaders("/home/sanchez/game_engines/Cengine/Cengine/shaders/cube2.vertexshader", "/home/sanchez/game_engines/Cengine/Cengine/shaders/cube2.fragmentshader");
-        //cube.mesh.setShaders("/home/sanchez/game_engines/Cengine/Cengine/shaders/cube1.vertexshader", "/home/sanchez/game_engines/Cengine/Cengine/shaders/cube1.fragmentshader");
+        small_cube.mesh.setShaders("shaders/cube2.vertexshader", "shaders/cube2.fragmentshader");
         small_cube.mesh.setCubeShape(0, 0, 0, 3);
         small_cube.rotateX(glm::radians(180.f));
         small_cube.translate({0, -20, 0});
