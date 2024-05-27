@@ -39,18 +39,6 @@ namespace scn{
             keymap[GLFW_KEY_LEFT_CONTROL] = true;
         else if (key == GLFW_KEY_LEFT_CONTROL && action == GLFW_RELEASE)
             keymap[GLFW_KEY_LEFT_CONTROL] = false;
-        // if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        //     character.translate({0, 0, SPEED});
-        // if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        //     character.translate({0, 0, -SPEED});
-        // if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        //     character.translate({-SPEED, 0, 0});
-        // if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        //     character.translate({SPEED, 0, 0});
-        // if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        //     character.translate({0, SPEED, 0});
-        // if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-        //     character.translate({0, -SPEED, 0});
     }
     void keyHandler(){
         if (keymap[GLFW_KEY_W] == true)

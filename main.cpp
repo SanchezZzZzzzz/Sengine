@@ -1,6 +1,7 @@
 #define SET_CURSOR_VISIBLE 1
 #define SET_CURSOR_HIDDEN 0
 #define SET_CURSOR_DISABLED 2
+#define STB_IMAGE_IMPLEMENTATION
 //#include <signal.h>
 //#include <thread>
 #include <iostream>
@@ -25,6 +26,7 @@
 #include "input/input.hpp"
 #include "python/pythonscript.hpp"
 #include "graphics/shader.hpp"
+#include "graphics/stb_image.h"
 #include "graphics/draw.hpp"
 #include "nodes/nodes.hpp"
 #include "ui/ui.hpp"

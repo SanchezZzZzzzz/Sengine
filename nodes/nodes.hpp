@@ -74,6 +74,7 @@ void Mesh::draw(glm::mat4 matrix){
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
     glEnableVertexAttribArray(3);
+    glEnableVertexAttribArray(4);
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glBindBuffer(GL_ARRAY_BUFFER, m_NBO);
@@ -81,8 +82,13 @@ void Mesh::draw(glm::mat4 matrix){
     glBindBuffer(GL_ARRAY_BUFFER, m_DifBO);
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glBindBuffer(GL_ARRAY_BUFFER, m_RefBO);
-    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glUniform1i(texid, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, m_texcBO);
+    glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glDrawArrays(GL_TRIANGLES, 0, m_vertex_coordinates.size());
+    glBindTexture(GL_TEXTURE_2D, 0);
     glDisableVertexAttribArray(0);
     mvp = projection * CURRENT_CAMERA->getMatrix() * glm::inverse(matrix);
     glUniformMatrix4fv(mvpid, 1, GL_FALSE, &mvp[0][0]);
@@ -128,26 +134,30 @@ std::vector<Node> loadMeshFromFile(std::string file_name){
                                 }             
                                 if (vertex[1] != "")
                                     temp.mesh.addTexureCoordinate(texture_coordinates[stoi(vertex[1]) - 1]);
+                                else
+                                    temp.mesh.addTexureCoordinate(glm::vec2(0, 0));
                                 if (vertex[2] != "")
                                     temp.mesh.addNormalVector(normals[stoi(vertex[2]) - 1]);
                             }  
                     }
                     else if (tempstr[0] == "usemtl") {
                         last_material = findMaterialByName(tempstr[1]);
+                        if (last_material.has_texture)
+                            temp.mesh.addTexture_data(last_material);
                     }
                     else if (tempstr[0] != "s") {
                         glm::vec3 coords = getFloatVector(tempstr, 1);
                         if (tempstr[0] == "v") //Если строка это вершины
                             vertices.push_back(coords);
                         else if (tempstr[0] == "vt") //Тот же алгоритм с текстурными координатами
-                            texture_coordinates.push_back(glm::vec2(coords));
+                            texture_coordinates.push_back(glm::vec2(coords[0], coords[1]));
                         else if (tempstr[0] == "vn") //И нормальными
                             normals.push_back(coords);
                     }
                 }
             }
             catch(...){
-                printf("Got an error in string '%s'", parsed);
+                std::cout << "Got an error in string '" << parsed <<"'\n";
             }
         }
         node_set.push_back(temp);

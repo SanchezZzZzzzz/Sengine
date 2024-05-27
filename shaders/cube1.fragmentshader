@@ -2,6 +2,7 @@
 vec3 light_color1 = vec3(0.8, 0.5, 0.3);
 vec3 light_color2 = vec3(0.1, 0.1, 0.5);
 float LightPower;
+in vec2 UV;
 in vec3 material_diffuse_color;
 in vec3 Normal_cameraspace;
 in vec3 light_direction_1;
@@ -12,6 +13,7 @@ vec3 n;
 vec3 l1;
 vec3 l2;
 out vec3 color;
+uniform sampler2D texture_sampler;
 void main(){
   n = normalize(Normal_cameraspace);
   l1 = normalize(light_direction_1);
@@ -21,5 +23,5 @@ void main(){
   float cos_alpha = clamp(dot(e, r), 0, 1);
   float cos_theta1 = clamp(dot(n, l1), 0.1, 1);
   float cos_theta2 = clamp(dot(n, l2), 0.1, 1);
-  color = (material_diffuse_color * light_color1 * cos_theta1 * 1.75) + (material_diffuse_color * cos_theta2 * light_color2); 
+  color = ((texture(texture_sampler, UV).rgb + material_diffuse_color) * light_color1 * cos_theta1 * 1.75) + ((texture(texture_sampler, UV).rgb + material_diffuse_color) * cos_theta2 * light_color2); 
 }
