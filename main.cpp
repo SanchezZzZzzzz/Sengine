@@ -1,12 +1,14 @@
 #define SET_CURSOR_VISIBLE 1
 #define SET_CURSOR_HIDDEN 0
 #define SET_CURSOR_DISABLED 2
+#define STB_IMAGE_IMPLEMENTATION
 //#include <signal.h>
 //#include <thread>
 #include <iostream>
 //#include <string>
 #include <vector>
 #include <list>
+#include <unordered_map>
 #include <fstream>
 #include <sstream>
 #include <GL/glew.h>
@@ -18,10 +20,13 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/transform.hpp>
+#include <memory>
 #include "utility/error_callback.hpp"
+#include "utility/properties.hpp"
 #include "input/input.hpp"
 #include "python/pythonscript.hpp"
 #include "graphics/shader.hpp"
+#include "graphics/stb_image.h"
 #include "graphics/draw.hpp"
 #include "nodes/nodes.hpp"
 #include "ui/ui.hpp"
