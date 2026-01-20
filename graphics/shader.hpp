@@ -13,6 +13,8 @@ GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path
 		VertexShaderCode = sstr.str();
 		VertexShaderStream.close();
 	}else{
+		printf("Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n", vertex_file_path);
+		getchar();
 		return 0;
 	}
 
@@ -30,6 +32,7 @@ GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path
 	int InfoLogLength;
 
 	// Compile Vertex Shader
+	printf("Compiling shader : %s\n", vertex_file_path);
 	char const * VertexSourcePointer = VertexShaderCode.c_str();
 	glShaderSource(VertexShaderID, 1, &VertexSourcePointer , NULL);
 	glCompileShader(VertexShaderID);
@@ -44,6 +47,7 @@ GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path
 	}
 
 	// Compile Fragment Shader
+	printf("Compiling shader : %s\n", fragment_file_path);
 	char const * FragmentSourcePointer = FragmentShaderCode.c_str();
 	glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer , NULL);
 	glCompileShader(FragmentShaderID);
@@ -58,6 +62,7 @@ GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path
 	}
 
 	// Link the program
+	printf("Linking program\n");
 	GLuint ProgramID = glCreateProgram();
 	glAttachShader(ProgramID, VertexShaderID);
 	glAttachShader(ProgramID, FragmentShaderID);
@@ -71,13 +76,12 @@ GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path
 		glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, &ProgramErrorMessage[0]);
 		printf("%s\n", &ProgramErrorMessage[0]);
 	}
-
+	
 	glDetachShader(ProgramID, VertexShaderID);
 	glDetachShader(ProgramID, FragmentShaderID);
-
+	
 	glDeleteShader(VertexShaderID);
 	glDeleteShader(FragmentShaderID);
 
 	return ProgramID;
 }
-

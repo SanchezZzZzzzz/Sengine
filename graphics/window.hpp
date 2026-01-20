@@ -10,6 +10,11 @@ public:
         glewExperimental = GL_TRUE;
         if (GL_TRUE != glfwInit())
             fprintf(stderr, "Error!");
+        glfwWindowHint(GLFW_SAMPLES, 16);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         this->m_window = glfwCreateWindow(x, y, window_name, NULL, NULL);
         if (this->m_window == NULL){
             fprintf(stderr, "Failed to open GLFW window\n");
@@ -24,37 +29,37 @@ public:
             glBindVertexArray(vertex_array_object);
         }
         CURRENT_WINDOW = this->m_window;
-        input.setWindowSize(x, y);
+        window_properties.setWindowSize(x, y);
     }
 
     void render();
     void close() {
         m_closed = 1;
     }
-    void setPerspective(GLfloat angle, GLfloat width, GLfloat height, GLfloat close, GLfloat far, GLuint &programID){
-        glm::mat4 projection = glm::perspective(glm::radians(angle), (float) width/height, close, far);
-        glm::mat4 mvp = projection * CURRENT_CAMERA->view;
-        GLuint MatrixID = glGetUniformLocation(programID, "MVP");
-        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
-    }
     void set_orthogonal(GLfloat x_start, GLfloat x_end, GLfloat y_start, GLfloat y_end, GLfloat z_near, GLfloat z_far, GLuint &programID){
         glm::mat4 projection = glm::ortho(x_start, x_end, y_start, y_end, z_near, z_far);
-        glm::mat4 mvp = projection * CURRENT_CAMERA->view;
+        glm::mat4 mvp = projection * CURRENT_CAMERA->getMatrix();
         GLuint MatrixID = glGetUniformLocation(programID, "MVP");
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
     }
 };
 void Window::render(){
         glfwSetInputMode(m_window, GLFW_STICKY_KEYS, GL_TRUE);
-        glClearColor(0.0, 0.0, 0.2, 0.0f);
+        glClearColor(0.0f, 0.05, 0.1f, 0.0f);
         glfwSetCursorPos(CURRENT_WINDOW, 0, 0);
-        scn::sceneSetup();
-        GLuint ProgramID = LoadShaders("/home/sanchez/game_engines/Cengine/Cengine/shaders/SimpleVertexShader.vertexshader", "/home/sanchez/game_engines/Cengine/Cengine/shaders/fragments.fragmentshader" );
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_MULTISAMPLE);
+        glEnable(GL_LINE_SMOOTH);
+        glEnable(GL_CULL_FACE);
+        glEnable(GL_TEXTURE_2D);
+        glFrontFace(GL_CW);
+        glCullFace(GL_FRONT);
+        scn::sceneSetup();    
         do{
             input.getMousePosition();
-            glClear( GL_COLOR_BUFFER_BIT );
-            setPerspective(45.f, input.getWindowSizeX(), input.getWindowSizeY(), 0.1, 100.0f, ProgramID);
-            glUseProgram(ProgramID);
+            glDepthFunc(GL_LESS);
+            glfwSetInputMode(CURRENT_WINDOW, GLFW_STICKY_KEYS, GLFW_TRUE);
+            glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             scn::scene();
             glfwSetCursorPos(CURRENT_WINDOW, 0, 0);     
             glFlush();
